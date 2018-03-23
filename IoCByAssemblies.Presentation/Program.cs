@@ -9,8 +9,7 @@ namespace IoCByAssemblies.Presentation
     {
         static void Main(string[] args)
         {
-            Kernel.RegisterAssemblyName("IoCByAssemblies.ContextA");
-            Kernel.RegisterAssemblyName("IoCByAssemblies.ContextC");
+            Kernel.RegisterAssembliesBySolutionName("IoCByAssemblies");
 
             var serviceA = Kernel.GetInstance<ContextA.IAService>();
             var serviceByContextC = Kernel.GetInstance<ContextC.IAService>();
