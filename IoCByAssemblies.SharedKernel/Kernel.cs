@@ -7,7 +7,7 @@ namespace IoCByAssemblies.SharedKernel
 {
     public abstract class Kernel
     {
-        private static Dictionary<string, IContainer> _containers;
+        private readonly static Dictionary<string, IContainer> _containers;
 
         static Kernel()
         {
