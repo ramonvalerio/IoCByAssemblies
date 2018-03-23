@@ -14,20 +14,26 @@ namespace IoCByAssemblies.SharedKernel
             _containers = new Dictionary<string, IContainer>();
         }
 
-        public static void RegisterAssemblyName(string assemblyName)
+        public static void RegisterAssembliesBySolutionName(string solutionName)
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.GetName().Name == assemblyName).ToArray();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName.Contains(solutionName)).ToArray();
 
-            var builder = new ContainerBuilder();
-            builder.RegisterAssemblyTypes(assemblies).Where(x => x.Name.EndsWith("Service")).AsImplementedInterfaces();
-            builder.RegisterAssemblyTypes(assemblies).Where(x => x.Name.EndsWith("Factory")).AsImplementedInterfaces();
-            builder.RegisterAssemblyTypes(assemblies).Where(x => x.Name.EndsWith("Repository")).AsImplementedInterfaces();
-            builder.RegisterAssemblyTypes(assemblies).Where(x => x.Name.EndsWith("Cache")).AsImplementedInterfaces().SingleInstance();
+            foreach (var assembly in assemblies)
+            {
+                var builder = new ContainerBuilder();
 
-            _containers.Add(assemblyName, builder.Build());
+                builder.RegisterAssemblyTypes(assembly).Where(x => x.Name.EndsWith("Service")).AsImplementedInterfaces();
+                builder.RegisterAssemblyTypes(assembly).Where(x => x.Name.EndsWith("Factory")).AsImplementedInterfaces();
+                builder.RegisterAssemblyTypes(assembly).Where(x => x.Name.EndsWith("Repository")).AsImplementedInterfaces();
+                builder.RegisterAssemblyTypes(assembly).Where(x => x.Name.EndsWith("Cache")).AsImplementedInterfaces().SingleInstance();
+
+                var container = builder.Build();
+
+                _containers.Add(assembly.GetName().Name, container);
+            }
         }
 
-        public static T GetInstance<T>()
+        public static T GetInstance<T>() where T : class
         {
             var assemblyName = typeof(T).Assembly.GetName().Name;
 
